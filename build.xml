@@ -1,0 +1,56 @@
+<?xml version="1.0" standalone="yes"?>
+<project name="air_ios_consts_bug" default="package-ios" basedir="." xmlns:artifact="urn:maven-artifact-ant">
+  <!-- <property name="airsdk.dir" location="/pass_me_the_location_of_your_AIRSDK"/> -->
+  <property environment="env"/>
+  <property name="airsdk.dir" value="${env.AIR_HOME}"/>
+  <property name="deploy.dir" value="dist"/>
+
+  <target name="clean">
+    <delete dir="${deploy.dir}" verbose="true"/>
+  </target>
+
+  <target name="swf" description="builds the swf">
+    <java jar="${airsdk.dir}/lib/mxmlc-cli.jar" failonerror="true" fork="true" maxmemory="1024m">
+      <jvmarg value="-Djava.awt.headless=true"/>
+      <arg value="+configname=air"/>
+      <arg value="-load-config=${airsdk.dir}/frameworks/air-config.xml"/>
+      <arg value="-verbose-stacktraces=true"/>
+      <arg value="-use-network=false"/>
+      <arg value="-compiler.debug=true"/>
+      <arg value="-compiler.optimize=true"/>
+      <arg value="-compiler.omit-trace-statements=false"/>
+      <arg value="-source-path+=src"/>
+      <arg value="-output=${deploy.dir}/air_ios_consts_bug.swf"/>
+      <arg value="src/Main.as"/>
+    </java>
+  </target>
+
+  <target name="package-ios" depends="swf" description="Packages the iOS client ipa">
+    <java jar="${airsdk.dir}/lib/adt.jar" fork="true" failonerror="true">
+      <arg value="-package"/>
+      <arg value="-target"/><arg value="ipa-ad-hoc"/>
+
+      <!-- Signing options -->
+      <arg value="-storetype"/><arg value="pkcs12"/>
+      <arg value="-keystore"/><arg value="cert.p12"/>
+      <arg value="-storepass"/><arg value="password"/>
+      <arg value="-provisioning-profile"/><arg value="ios.mobileprovision"/>
+      <arg value="${deploy.dir}/air_ios_consts_bug.ipa"/> <!-- output name -->
+      <arg value="airdesc.xml"/> <!-- app descriptor -->
+
+      <!-- our swf -->
+      <arg value="-C"/>
+      <arg value="${deploy.dir}"/>
+      <arg value="air_ios_consts_bug.swf"/>
+    </java>
+  </target>
+
+  <target name="install-ios" depends="package-ios" description="Installs the built .ipa to a connected iOS device.">
+    <java jar="${airsdk.dir}/lib/adt.jar" fork="true" failonerror="true">
+      <arg value="-installApp"/>
+      <arg line="-platform ios"/>
+      <arg line="-package ${deploy.dir}/air_ios_consts_bug.ipa"/>
+    </java>
+  </target>
+
+</project>

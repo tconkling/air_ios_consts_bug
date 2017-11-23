@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<application xmlns="http://ns.adobe.com/air/application/27.0">
+  <id>com.timconkling.airbug</id>
+  <filename>airbug</filename>
+  <name>airbug</name>
+  <versionNumber>1</versionNumber>
+
+  <initialWindow>
+    <content>air_ios_consts_bug.swf</content>
+  </initialWindow>
+</application>
